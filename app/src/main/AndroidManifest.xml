@@ -3,25 +3,47 @@
     package="com.bigteam.kosta.bigteamclnt">
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
+        android:name="com.bigteam.kosta.bigteamclnt.app.AppData"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <activity android:name=".Splash" android:theme="@style/NoTitle" />
+        <activity android:name=".Splash" />
 
-        <activity android:name=".MainActivity">
+        <activity android:name=".activity.MainActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="landscape"
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <activity android:name=".FileExplorerActivity"/>
+        <activity
+            android:name=".activity.ApkListActivity"
+            android:label="설치APPList"
+            android:theme="@android:style/Theme.Light.NoTitleBar.Fullscreen"
+            android:screenOrientation="landscape"
+            >
+        </activity>
+        <activity
+            android:name=".activity.ApkInfo"
+            android:label="ApkInfoDetail"
+            android:theme="@android:style/Theme.Light.NoTitleBar.Fullscreen"
+            android:screenOrientation="landscape"
+            >
+        </activity>
+        <activity
+            android:name=".activity.FileExplorerActivity"
+            android:label="파일탐색기"
+            android:screenOrientation="landscape"
+            >
+         </activity>
 
     </application>
 

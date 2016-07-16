@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Formatter;
 
 public class HashUtil
@@ -34,4 +35,23 @@ public class HashUtil
         }
         return formatter.toString();
     }
+
+    public static String getSHA256Code(String filePath) throws Exception{
+        // ------------------ HASH MD5 VALUE 추출 시작
+        String SHA = "";
+        try
+        {
+            MessageDigest SHA256 = MessageDigest.getInstance("SHA-256");
+            System.out.println(calculateHash(SHA256, filePath));
+            SHA = HashUtil.calculateHash(SHA256, filePath);
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+            SHA = null;
+        }
+        return SHA;
+        // ------------------ HASH MD5 VALUE 추출 끝
+    }
+
 }

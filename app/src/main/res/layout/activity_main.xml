@@ -7,23 +7,31 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.bigteam.kosta.bigteamclnt.MainActivity">
+    tools:context=".activity.MainActivity">
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="설치된 앱 검사"
+        android:text="설치된 앱 목록"
+        android:onClick="onClickApkListView"
         android:id="@+id/button"
-        android:layout_above="@+id/button2" />
+        android:layout_above="@+id/button2"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"/>
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="보유 APK파일 검사"
+        android:text="보유 APK파일 목록"
         android:onClick="onClickFileExplorer"
         android:id="@+id/button2"
         android:layout_above="@+id/button3"
-        android:layout_centerHorizontal="true" />
+        android:layout_alignRight="@+id/button"
+        android:layout_alignEnd="@+id/button"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"/>
 
     <Button
         android:layout_width="wrap_content"
@@ -31,5 +39,8 @@
         android:text="지난 분석 결과 보기"
         android:id="@+id/button3"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_alignRight="@+id/button2"
+        android:layout_alignEnd="@+id/button2"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 </RelativeLayout>
