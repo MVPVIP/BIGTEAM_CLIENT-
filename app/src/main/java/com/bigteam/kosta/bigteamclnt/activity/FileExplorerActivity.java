@@ -24,11 +24,20 @@ import com.bigteam.kosta.bigteamclnt.HashUtil;
 import com.bigteam.kosta.bigteamclnt.R;
 import com.bigteam.kosta.bigteamclnt.virusTotalApi;
 
+import org.apache.commons.codec.binary.Base64;
+
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
+import virustotalapi.ReportScan;
 
 //import com.bigteam.kosta.bigteamclnt.HashUtil;
 //import java.security.MessageDigest;
@@ -51,13 +60,6 @@ public class FileExplorerActivity extends AppCompatActivity {
     private TextView mPath;
     private String mFileURI;
     private String sha256Hash;
-
-//    static final int PROGRESS_DIALOG = 0;
-//    ProgressThread progressThread;
-//    ProgressDialog progressDialog;
-
-
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -90,6 +92,7 @@ public class FileExplorerActivity extends AppCompatActivity {
                     int toastTime = 1000;
 
                     if (getExtension(mFileName).toLowerCase().equals("apk")) {  // 확장자가 apk인 경우를 식별하여 토스트로 사용자에게 출력
+//                        if (!getExtension(mFileName).toLowerCase().equals("ap")) {  // 테스트 용 -> apk가 아닌 파일도 검색 허용
                         Toast.makeText(getApplicationContext(), mFileName +"을 선택하였습니다.", Toast.LENGTH_SHORT).show();
 
                         final CharSequence[] items = {"빠른 분석", "정밀 분석", "취소"};
@@ -110,22 +113,39 @@ public class FileExplorerActivity extends AppCompatActivity {
 
 
                                             new Thread () {
+                                                ProgressDialog pDialog = ProgressDialog.show(FileExplorerActivity.this, "빠른 분석",
+                                                    "분석 중입니다. 잠시 기다려주세요", true);
                                                 public void run() {
                                                     try  {
+                                                        Log.i("Test", "Get Hash value Start!!!" );
                                                         sha256Hash = HashUtil.getSHA256Code(mFileURI);
                                                         Log.i("Test", "sha256Hash_VALUE:"   + sha256Hash);
-                                                        virusTotalApi.detectBySha256(sha256Hash);
+
+//                                                        virusTotalApi.detectBySha256(sha256Hash);
+                                                        Set<ReportScan> Report = new HashSet<ReportScan>();
+                                                        Report = virusTotalApi.detectBySha256Code(sha256Hash);
+//                                                        for (ReportScan report : Report) {
+//                                                            System.out.println("AV: " + report.getVendor() + " Detected: " + report.getDetected() + " Update: " + report.getUpdate() + " Malware Name: " + report.getMalwarename());
+//                                                        }
+
+
+                                                        pDialog.dismiss();
+
+
+
+
+
+
+
                                                     } catch (Exception e) {
                                                         e.printStackTrace();
                                                     }
                                                 }
                                             }.start();
 
+                                            // 테스트 앱 해쉬값(sha-256 정보), 테스트 APK파일 명
                                             //  14711411fb3ba975aa7651a8a21605a6c9f45a1704461c9ab9af846f3cf9b4c3
                                             //   aaaaa_VirusShare_00d931896158edaa43552f8c10d1a888.apk
-
-
-
 
                                         } else {
                                             Toast.makeText(getApplicationContext(), items[index] + "이 선택되었습니다.", Toast.LENGTH_SHORT).show();
@@ -179,83 +199,4 @@ public class FileExplorerActivity extends AppCompatActivity {
         return fileStr.substring(fileStr.lastIndexOf(".")+1,fileStr.length());
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//    protected Dialog onCreateDialog(int id) {
-//        switch (id) {
-//            case PROGRESS_DIALOG:
-//                progressDialog = new ProgressDialog(FileExplorerActivity.this);
-//                progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-//                progressDialog.setMessage("Loading...");
-//                progressThread = new ProgressThread(handler);
-//                progressThread.start();
-//                return progressDialog;
-//            default:
-//                return null;
-//        }
-//    }
-//
-//    // 핸들러는 정의하여 스레드가 메시지를 보내면 프로그레스를 업데이트 합니다.
-//    final Handler handler = new Handler() {
-//        public void handleMessage(Message msg) {
-//            int total = msg.getData().getInt("total");
-//
-//            progressDialog.setProgress(total);
-//            if (total >= 100) {
-//                dismissDialog(PROGRESS_DIALOG);
-//                progressThread.setState(ProgressThread.STATE_DONE);
-//            }
-//        }
-//    };
-//
-//
-//    /** 프로그레스를 처리하는 클래스를 내부 클래스로 정의. */
-//    private class ProgressThread extends Thread {
-//        Handler mHandler;
-//        final static int STATE_DONE = 0;
-//        final static int STATE_RUNNING = 1;
-//        int mState;
-//        int total;
-//
-//        ProgressThread(Handler h) {
-//            mHandler = h;
-//        }
-//
-//        public void run() {
-//            mState = STATE_RUNNING;
-//            total = 0;
-//            while (mState == STATE_RUNNING) {
-//                try {
-//                    Thread.sleep(100);
-//                } catch (InterruptedException e) {
-//                    // 에러처리
-//                }
-//                Message msg = mHandler.obtainMessage();
-//                Bundle b = new Bundle();
-//                b.putInt("total", total);
-//                msg.setData(b);
-//                mHandler.sendMessage(msg);
-//                total++;
-//            }
-//        }
-//
-//        // 현재의 상태를 설정하는 메소드
-//        public void setState(int state) {
-//            mState = state;
-//        }
-//    }
 }
