@@ -45,6 +45,14 @@
             >
          </activity>
 
+        <activity
+            android:name=".activity.VTResultPopActivity"
+            android:label="빠른분석(VirusTotal) 결과"
+            android:screenOrientation="landscape"
+            android:theme="@android:style/Theme.Dialog"
+            >
+        </activity>
+
     </application>
 
 </manifest>

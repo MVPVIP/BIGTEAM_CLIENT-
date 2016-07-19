@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -33,7 +34,9 @@ import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Set;
 
@@ -102,7 +105,7 @@ public class FileExplorerActivity extends AppCompatActivity {
                         // 여기서 부터는 알림창의 속성 설정
                         builder.setTitle("분석방법을 선택하세요")        // 제목 설정
                                 .setItems(items, new DialogInterface.OnClickListener(){    // 목록 클릭시 설정
-                                    public void onClick(DialogInterface dialog, int index){
+                                    public void onClick(DialogInterface dialog, final int index){
                                         if (items[index].equals("취소")) {
                                             Toast.makeText(getApplicationContext(), items[index]+"가 선택되었습니다.", Toast.LENGTH_SHORT).show();
                                         } else if (items[index].equals("빠른 분석")){
@@ -129,13 +132,47 @@ public class FileExplorerActivity extends AppCompatActivity {
 //                                                        }
 
 
+//                                                        ArrayList resultString = new ArrayList();
+//                                                        for (ReportScan report : Report) {
+//                                                            resultString.add(" : " + report.getVendor() + "   Detected : " +report.getMalwarename() + "  업데이트 : " + report.getUpdate());
+//                                                        }
+//                                                        Intent intent = new Intent(getApplicationContext(), VTResultPopActivity.class);
+//                                                        intent.putExtra("result", resultString);
+
+                                                        ArrayList resultListData = new ArrayList();
+                                                        HashMap<String, String> resultHashmap = new HashMap<String, String>();
+
+                                                        Log.i("Test", "Report Result:"   + Report);
+
+                                                        // REPORT 값이 NULL일 경우 예외처리를 구현한다.
+                                                        // REPORT 값이 NULL일 경우 예외처리를 구현한다.
+                                                        // REPORT 값이 NULL일 경우 예외처리를 구현한다.
+                                                        // REPORT 값이 NULL일 경우 예외처리를 구현한다.
+                                                        // REPORT 값이 NULL일 경우 예외처리를 구현한다.
+                                                        // REPORT 값이 NULL일 경우 예외처리를 구현한다.
+                                                        // REPORT 값이 NULL일 경우 예외처리를 구현한다.
+                                                        // REPORT 값이 NULL일 경우 예외처리를 구현한다.
+                                                        // REPORT 값이 NULL일 경우 예외처리를 구현한다.
+                                                        // REPORT 값이 NULL일 경우 예외처리를 구현한다.
+
+                                                        for (ReportScan report : Report) {
+                                                            resultHashmap = new HashMap<String, String>();
+                                                            resultHashmap.put("AV",report.getVendor());
+                                                            resultHashmap.put("Detected",report.getMalwarename());
+                                                            resultHashmap.put("update",report.getUpdate());
+//                                                            resultListData.add(resultHashmap);
+                                                            resultListData.add(index, resultHashmap);
+
+//                                                            Log.i("Test", "for - resultListData:"   + resultListData);
+                                                        }
+
+
+                                                        Intent intent = new Intent(getApplicationContext(), VTResultPopActivity.class);
+                                                        intent.putExtra("resultListData", resultListData);
+
+//                                                        pDialog.dismiss();
+                                                        startActivity(intent);
                                                         pDialog.dismiss();
-
-
-
-
-
-
 
                                                     } catch (Exception e) {
                                                         e.printStackTrace();

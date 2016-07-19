@@ -40,13 +40,10 @@ public class virusTotalApi {
         Set<ReportScan> Report = new HashSet<ReportScan>();
         try {
             Report = VT.ReportScan(sha256Value); // sha256Value : 대상 apk 파일로부터 sha256 해시 값을 추출하여 사용하도록 한다.
-
 //            for (ReportScan report : Report) {
 //
 //                System.out.println("AV: " + report.getVendor() + " Detected: " + report.getDetected() + " Update: " + report.getUpdate() + " Malware Name: " + report.getMalwarename());
 //            }
-
-
         } catch (Exception e) {
             e.printStackTrace();
         }
