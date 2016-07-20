@@ -363,6 +363,10 @@ public class FileExplorerActivity extends AppCompatActivity {
                             messageText.setText(msg);
                             Toast.makeText(FileExplorerActivity.this, "File Upload Complete.",
                                     Toast.LENGTH_SHORT).show();
+
+                            messageText.setText(msg);
+                            Toast.makeText(FileExplorerActivity.this, "메인화면의 분석 결과 보기를 선택하여 결과를 확인해주세요.",
+                                    Toast.LENGTH_SHORT).show();
                         }
                     });
                 }
