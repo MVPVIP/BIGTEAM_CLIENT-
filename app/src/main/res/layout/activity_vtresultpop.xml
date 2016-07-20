@@ -11,7 +11,7 @@ android:layout_height="300dip"
     android:layout_alignParentLeft="true"
     android:layout_alignParentRight="true"
     android:layout_alignParentTop="true"
-    android:text="VirusTotal 분석결과"
+    android:text="빠른분석(VirusTotal) 결과"
     android:textSize="25sp"
     android:shadowColor="#034ff4"
     android:textIsSelectable="true"
@@ -51,13 +51,13 @@ android:layout_height="300dip"
     android:layout_alignParentLeft="true"
     android:layout_alignParentStart="true" />
 
-<ProgressBar
-    android:id="@+id/progressBar1"
-    style="?android:attr/progressBarStyleLarge"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_below="@+id/textView1"
-    android:layout_centerHorizontal="true"
-    android:layout_marginTop="14dp" />
+<!--<ProgressBar-->
+    <!--android:id="@+id/progressBar1"-->
+    <!--style="?android:attr/progressBarStyleLarge"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_below="@+id/textView1"-->
+    <!--android:layout_centerHorizontal="true"-->
+    <!--android:layout_marginTop="14dp" />-->
 
 </RelativeLayout>

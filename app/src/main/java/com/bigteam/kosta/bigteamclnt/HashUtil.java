@@ -37,7 +37,6 @@ public class HashUtil
     }
 
     public static String getSHA256Code(String filePath) throws Exception{
-        // ------------------ HASH MD5 VALUE 추출 시작
         String SHA = "";
         try
         {
@@ -51,7 +50,22 @@ public class HashUtil
             SHA = null;
         }
         return SHA;
-        // ------------------ HASH MD5 VALUE 추출 끝
+    }
+
+    public static String getMD5Code(String filePath) throws Exception{
+        String md5 = "";
+        try
+        {
+            MessageDigest MD5 = MessageDigest.getInstance("MD5");
+            System.out.println(calculateHash(MD5, filePath));
+            md5 = HashUtil.calculateHash(MD5, filePath);
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+            md5 = null;
+        }
+        return md5;
     }
 
 }

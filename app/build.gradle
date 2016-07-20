@@ -11,9 +11,19 @@ android {
         versionCode 1
         versionName "1.0"
     }
+    // 추가하였음(서명 작업)
+    signingConfigs {
+        release {
+            storeFile file("signature/release.jks")
+            storePassword "P@ssw0rd"
+            keyAlias "releasekey"
+            keyPassword "P@ssw0rd"
+        }
+    }
     buildTypes {
         release {
             minifyEnabled false
+            signingConfig signingConfigs.release    // 여기
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }

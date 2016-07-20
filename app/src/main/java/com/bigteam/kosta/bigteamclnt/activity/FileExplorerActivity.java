@@ -1,6 +1,5 @@
 package com.bigteam.kosta.bigteamclnt.activity;
 
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -8,7 +7,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.os.Message;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -25,25 +23,21 @@ import com.bigteam.kosta.bigteamclnt.HashUtil;
 import com.bigteam.kosta.bigteamclnt.R;
 import com.bigteam.kosta.bigteamclnt.virusTotalApi;
 
-import org.apache.commons.codec.binary.Base64;
-
-import java.io.BufferedInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Set;
 
 import virustotalapi.ReportScan;
-
-//import com.bigteam.kosta.bigteamclnt.HashUtil;
-//import java.security.MessageDigest;
 
 /**
  * Created on 2016-07-12.
@@ -63,6 +57,10 @@ public class FileExplorerActivity extends AppCompatActivity {
     private TextView mPath;
     private String mFileURI;
     private String sha256Hash;
+
+    TextView messageText;
+    String upLoadServerUri = null;
+    int serverResponseCode = 0;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -91,8 +89,7 @@ public class FileExplorerActivity extends AppCompatActivity {
                     mFileName = file.getName();
                     mFileURI = lPath.get(position);
                     Log.i("Test", "ext:" + mFileName.substring(mFileName.lastIndexOf('.') + 1, mFileName.length()));
-                    Log.i("Test", mFileURI + "777");
-                    int toastTime = 1000;
+                    Log.i("Test", mFileURI);
 
                     if (getExtension(mFileName).toLowerCase().equals("apk")) {  // 확장자가 apk인 경우를 식별하여 토스트로 사용자에게 출력
 //                        if (!getExtension(mFileName).toLowerCase().equals("ap")) {  // 테스트 용 -> apk가 아닌 파일도 검색 허용
@@ -111,10 +108,6 @@ public class FileExplorerActivity extends AppCompatActivity {
                                         } else if (items[index].equals("빠른 분석")){
                                             Toast.makeText(getApplicationContext(), items[index] + "이 선택되었습니다.", Toast.LENGTH_SHORT).show();
 
-//                                            ProgressDialog pDialog = ProgressDialog.show(FileExplorerActivity.this, "빠른 분석",
-//                                                    "분석 중입니다. 잠시 기다려주세요", true);
-
-
                                             new Thread () {
                                                 ProgressDialog pDialog = ProgressDialog.show(FileExplorerActivity.this, "빠른 분석",
                                                     "분석 중입니다. 잠시 기다려주세요", true);
@@ -124,37 +117,12 @@ public class FileExplorerActivity extends AppCompatActivity {
                                                         sha256Hash = HashUtil.getSHA256Code(mFileURI);
                                                         Log.i("Test", "sha256Hash_VALUE:"   + sha256Hash);
 
-//                                                        virusTotalApi.detectBySha256(sha256Hash);
                                                         Set<ReportScan> Report = new HashSet<ReportScan>();
                                                         Report = virusTotalApi.detectBySha256Code(sha256Hash);
-//                                                        for (ReportScan report : Report) {
-//                                                            System.out.println("AV: " + report.getVendor() + " Detected: " + report.getDetected() + " Update: " + report.getUpdate() + " Malware Name: " + report.getMalwarename());
-//                                                        }
-
-
-//                                                        ArrayList resultString = new ArrayList();
-//                                                        for (ReportScan report : Report) {
-//                                                            resultString.add(" : " + report.getVendor() + "   Detected : " +report.getMalwarename() + "  업데이트 : " + report.getUpdate());
-//                                                        }
-//                                                        Intent intent = new Intent(getApplicationContext(), VTResultPopActivity.class);
-//                                                        intent.putExtra("result", resultString);
 
                                                         ArrayList resultListData = new ArrayList();
                                                         HashMap<String, String> resultHashmap = new HashMap<String, String>();
-
-                                                        Log.i("Test", "Report Result:"   + Report);
-
-                                                        // REPORT 값이 NULL일 경우 예외처리를 구현한다.
-                                                        // REPORT 값이 NULL일 경우 예외처리를 구현한다.
-                                                        // REPORT 값이 NULL일 경우 예외처리를 구현한다.
-                                                        // REPORT 값이 NULL일 경우 예외처리를 구현한다.
-                                                        // REPORT 값이 NULL일 경우 예외처리를 구현한다.
-                                                        // REPORT 값이 NULL일 경우 예외처리를 구현한다.
-                                                        // REPORT 값이 NULL일 경우 예외처리를 구현한다.
-                                                        // REPORT 값이 NULL일 경우 예외처리를 구현한다.
-                                                        // REPORT 값이 NULL일 경우 예외처리를 구현한다.
-                                                        // REPORT 값이 NULL일 경우 예외처리를 구현한다.
-
+//                                                        Log.i("Test", "Report Result:"   + Report);
                                                         for (ReportScan report : Report) {
                                                             resultHashmap = new HashMap<String, String>();
                                                             resultHashmap.put("AV",report.getVendor());
@@ -162,30 +130,95 @@ public class FileExplorerActivity extends AppCompatActivity {
                                                             resultHashmap.put("update",report.getUpdate());
 //                                                            resultListData.add(resultHashmap);
                                                             resultListData.add(index, resultHashmap);
-
 //                                                            Log.i("Test", "for - resultListData:"   + resultListData);
                                                         }
-
-
                                                         Intent intent = new Intent(getApplicationContext(), VTResultPopActivity.class);
                                                         intent.putExtra("resultListData", resultListData);
 
-//                                                        pDialog.dismiss();
                                                         startActivity(intent);
                                                         pDialog.dismiss();
-
                                                     } catch (Exception e) {
                                                         e.printStackTrace();
                                                     }
                                                 }
                                             }.start();
-
-                                            // 테스트 앱 해쉬값(sha-256 정보), 테스트 APK파일 명
-                                            //  14711411fb3ba975aa7651a8a21605a6c9f45a1704461c9ab9af846f3cf9b4c3
-                                            //   aaaaa_VirusShare_00d931896158edaa43552f8c10d1a888.apk
-
-                                        } else {
+                                        } else { // 정밀분석
                                             Toast.makeText(getApplicationContext(), items[index] + "이 선택되었습니다.", Toast.LENGTH_SHORT).show();
+
+                                            new Thread () {
+                                                ProgressDialog pDialog = ProgressDialog.show(FileExplorerActivity.this, "정밀 분석",
+                                                        "APK파일을 분석서버로 전송 중입니다. 잠시 기다려주세요", true);
+                                                public void run() {
+                                                    try  {
+                                                        String tempMD5APKName = HashUtil.getMD5Code(mFileURI) + ".apk";
+//                                                        Log.i("Test", "tempMD5APKName:"   + tempMD5APKName);
+//                                                        Log.i("Test", "tempMD5APKName:"   + mRoot + mFileName);
+
+                                                        File filePre = new File(getFileDirPath(mFileURI), mFileName );
+                                                        File fileNow = new File(getFileDirPath(mFileURI), tempMD5APKName);
+                                                        Log.i("Test", "filePre:"   + filePre);
+                                                        Log.i("Test", "fileNow:"   + fileNow);
+
+
+                                                        byte[] buf = new byte[1024];
+                                                        FileInputStream fin = null;
+                                                        FileOutputStream fout = null;
+
+//                                                        if(!filePre.renameTo(fileNow)){ // 파일의 이름을 해시코드(MD5)로 변경하는 것을 실패했을 경우의 대비코드.
+                                                            Log.i("Test", "renameTo");
+                                                            buf = new byte[1024];
+                                                            fin = new FileInputStream(filePre);
+                                                            fout = new FileOutputStream(fileNow);
+                                                            int read = 0;
+                                                            while((read=fin.read(buf,0,buf.length))!=-1){
+                                                                fout.write(buf, 0, read);
+                                                            }
+                                                            fin.close();
+                                                            fout.close();
+//                                                            filePre.delete();
+//                                                        }
+
+
+
+
+//                                                        if(filePre.renameTo(fileNow)){
+//                                                            Toast.makeText(getApplicationContext(), "변경 성공", Toast.LENGTH_SHORT).show();
+//                                                        }else{
+//                                                            Toast.makeText(getApplicationContext(), "변경 실패", Toast.LENGTH_SHORT).show();
+//                                                        }
+//
+//                                                        final String uploadFilePath = mFileURI; ///**********  File Path *************/
+                                                        final String uploadFilePath = getFileDirPath(mFileURI)+ tempMD5APKName; ///**********  File Path *************/
+//                                                        Log.i("Test", "uploadFilePath(MD5):"   + uploadFilePath);
+
+
+//                                                        int serverResponseCode = 0;
+//                                                        String upLoadServerUri = null;
+//                                                        final TextView messageText;
+                                                        messageText  = (TextView)findViewById(R.id.messageText);
+
+                                                        /************* Php script path ****************/
+                                                        upLoadServerUri = "http://192.168.0.146/upload.php";//서버컴퓨터의 ip주소
+                                                        new Thread(new Runnable() {
+                                                            public void run() {
+                                                                runOnUiThread(new Runnable() {
+                                                                    public void run() {
+                                                                        messageText.setText("uploading started.....");
+                                                                    }
+                                                                });
+
+                                                                uploadFile(uploadFilePath);
+                                                            }
+                                                        }).start();
+
+
+
+                                                        pDialog.dismiss();
+                                                    } catch (Exception e) {
+                                                        e.printStackTrace();
+                                                    }
+                                                }
+                                            }.start();
                                         }
                                     }
                                 });
@@ -235,5 +268,172 @@ public class FileExplorerActivity extends AppCompatActivity {
     public static String getExtension(String fileStr){ // 파일의 확장자를 가져오는 메소드
         return fileStr.substring(fileStr.lastIndexOf(".")+1,fileStr.length());
     }
+
+    public int uploadFile(final String sourceFileUri) {
+        Log.i("Test", "uploadFile START ...........FileURI:"   + sourceFileUri);
+       String fileName = sourceFileUri;
+
+        HttpURLConnection conn = null;
+        DataOutputStream dos = null;
+        String lineEnd = "\r\n";
+        String twoHyphens = "--";
+        String boundary = "*****";
+        int bytesRead, bytesAvailable, bufferSize;
+        byte[] buffer;
+        int maxBufferSize = 1 * 1024 * 1024;
+        File sourceFile = new File(sourceFileUri);
+
+        if (!sourceFile.isFile()) {
+
+//            dialog.dismiss();
+
+            Log.e("uploadFile", "Source File not exist :"
+                    +sourceFileUri );
+
+            runOnUiThread(new Runnable() {
+                public void run() {
+                    messageText.setText("Source File not exist :"
+                            +sourceFileUri);
+                }
+            });
+            return 0;
+        }
+        else {
+            try {
+                // open a URL connection to the Servlet
+                FileInputStream fileInputStream = new FileInputStream(sourceFile);
+                URL url = new URL(upLoadServerUri);
+
+                // Open a HTTP  connection to  the URL
+                conn = (HttpURLConnection) url.openConnection();
+                conn.setDoInput(true); // Allow Inputs
+                conn.setDoOutput(true); // Allow Outputs
+                conn.setUseCaches(false); // Don't use a Cached Copy
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Connection", "Keep-Alive");
+                conn.setRequestProperty("ENCTYPE", "multipart/form-data");
+                conn.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + boundary);
+                conn.setRequestProperty("uploaded_file", fileName);
+
+                dos = new DataOutputStream(conn.getOutputStream());
+
+                dos.writeBytes(twoHyphens + boundary + lineEnd);
+                dos.writeBytes("Content-Disposition: form-data; name=\"uploaded_file\";filename=\""
+                        + fileName + "\"" + lineEnd);
+
+                dos.writeBytes(lineEnd);
+
+                // create a buffer of  maximum size
+                bytesAvailable = fileInputStream.available();
+
+                bufferSize = Math.min(bytesAvailable, maxBufferSize);
+                buffer = new byte[bufferSize];
+
+                // read file and write it into form...
+                bytesRead = fileInputStream.read(buffer, 0, bufferSize);
+
+                while (bytesRead > 0) {
+
+                    dos.write(buffer, 0, bufferSize);
+                    bytesAvailable = fileInputStream.available();
+                    bufferSize = Math.min(bytesAvailable, maxBufferSize);
+                    bytesRead = fileInputStream.read(buffer, 0, bufferSize);
+
+                }
+
+                // send multipart form data necesssary after file data...
+                dos.writeBytes(lineEnd);
+                dos.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
+
+                // Responses from the server (code and message)
+                serverResponseCode = conn.getResponseCode();
+                String serverResponseMessage = conn.getResponseMessage();
+
+                Log.i("uploadFile", "HTTP Response is : "
+                        + serverResponseMessage + ": " + serverResponseCode);
+
+                if(serverResponseCode == 200){
+
+                    runOnUiThread(new Runnable() {
+                        public void run() {
+
+                            String msg = "File Upload Completed.\n\n See uploaded file here : \n\n"
+                                    +sourceFileUri;
+
+                            messageText.setText(msg);
+                            Toast.makeText(FileExplorerActivity.this, "File Upload Complete.",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+
+                //close the streams //
+                fileInputStream.close();
+                dos.flush();
+                dos.close();
+
+            } catch (MalformedURLException ex) {
+
+//                dialog.dismiss();
+                ex.printStackTrace();
+
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                        messageText.setText("MalformedURLException Exception : check script url.");
+                        Toast.makeText(FileExplorerActivity.this, "MalformedURLException",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+                Log.e("Upload file to server", "error: " + ex.getMessage(), ex);
+            } catch (Exception e) {
+
+//                dialog.dismiss();
+                e.printStackTrace();
+
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                        messageText.setText("Got Exception : see logcat ");
+                        Toast.makeText(FileExplorerActivity.this, "Got Exception : see logcat ",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
+                Log.e("Upload file Exception", "Exception : "
+                        + e.getMessage(), e);
+            }
+//            dialog.dismiss();
+            File fileNow = new File(fileName);
+            fileNow.delete();
+
+
+            return serverResponseCode;
+
+        } // End else block
+    }
+
+
+    public static String getFileName(String fullPath) {
+        int S = fullPath.lastIndexOf("\\");
+        int M = fullPath.lastIndexOf(".");
+        int E = fullPath.length();
+
+        String filename = fullPath.substring(S+1, M);
+        String extname = fullPath.substring(M+1, E);
+
+        String extractFileName = filename + "." + extname;
+        return extractFileName;
+    }
+
+    public static String getFileDirPath(String fullPath) {
+        Log.i("Test2", "fullPath: " + fullPath);
+        int S = fullPath.lastIndexOf("/");
+        int M = fullPath.lastIndexOf(".");
+        int E = fullPath.length();
+
+        String fileDirPath = fullPath.substring(0, S+1);
+        Log.i("Test2", "fileDirPath: " + fileDirPath);
+        return fileDirPath;
+    }
+
 
 }
