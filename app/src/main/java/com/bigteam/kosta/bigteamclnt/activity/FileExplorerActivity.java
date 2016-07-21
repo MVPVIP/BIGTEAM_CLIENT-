@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import com.bigteam.kosta.bigteamclnt.HashUtil;
 import com.bigteam.kosta.bigteamclnt.R;
+import com.bigteam.kosta.bigteamclnt.SqlLiteDBManger;
 import com.bigteam.kosta.bigteamclnt.virusTotalApi;
 
 import java.io.DataOutputStream;
@@ -31,7 +32,9 @@ import java.io.FileOutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -65,8 +68,10 @@ public class FileExplorerActivity extends AppCompatActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ActionBar actionBar = getSupportActionBar();    //  상단타이블바 가리기
-        actionBar.hide();                               //  상단타이블바 가리기
+
+//        ActionBar actionBar = getSupportActionBar();    //  상단타이블바 가리기
+//        actionBar.hide();                               //  상단타이블바 가리기
+
         setContentView(R.layout.activity_fileexplorer); // 리스트뷰 초기화
 
         mPath = (TextView) findViewById(R.id.tvPath);
@@ -207,7 +212,7 @@ public class FileExplorerActivity extends AppCompatActivity {
                                                                     }
                                                                 });
 
-                                                                uploadFile(uploadFilePath);
+                                                                uploadFile(uploadFilePath, mFileURI);
                                                             }
                                                         }).start();
 
@@ -269,9 +274,10 @@ public class FileExplorerActivity extends AppCompatActivity {
         return fileStr.substring(fileStr.lastIndexOf(".")+1,fileStr.length());
     }
 
-    public int uploadFile(final String sourceFileUri) {
+    public int uploadFile(final String sourceFileUri, final String sourceFileUriOri) {
         Log.i("Test", "uploadFile START ...........FileURI:"   + sourceFileUri);
-       String fileName = sourceFileUri;
+        String fileName_MD5 = sourceFileUri;
+        String fileName_origin = sourceFileUriOri;
 
         HttpURLConnection conn = null;
         DataOutputStream dos = null;
@@ -313,13 +319,13 @@ public class FileExplorerActivity extends AppCompatActivity {
                 conn.setRequestProperty("Connection", "Keep-Alive");
                 conn.setRequestProperty("ENCTYPE", "multipart/form-data");
                 conn.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + boundary);
-                conn.setRequestProperty("uploaded_file", fileName);
+                conn.setRequestProperty("uploaded_file", fileName_MD5);
 
                 dos = new DataOutputStream(conn.getOutputStream());
 
                 dos.writeBytes(twoHyphens + boundary + lineEnd);
                 dos.writeBytes("Content-Disposition: form-data; name=\"uploaded_file\";filename=\""
-                        + fileName + "\"" + lineEnd);
+                        + fileName_MD5 + "\"" + lineEnd);
 
                 dos.writeBytes(lineEnd);
 
@@ -406,25 +412,49 @@ public class FileExplorerActivity extends AppCompatActivity {
                         + e.getMessage(), e);
             }
 //            dialog.dismiss();
-            File fileNow = new File(fileName);
+            File fileNow = new File(fileName_MD5);
             fileNow.delete();
 
+
+            //////////////////////////////////////////////////////////////////////////
+            //////////////// 지난 분석 결과에 이력을 남기는 부분 시작/////////////////
+            final SqlLiteDBManger dbHelper = new SqlLiteDBManger(getApplicationContext(), "ApkAnalysisHistory.db", null, 1);
+
+            // 날짜는 현재 날짜로 고정
+            // 현재 시간 구하기
+            long now = System.currentTimeMillis();
+            Date date = new Date(now);        // 출력될 포맷 설정
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy년 MM월 dd일 hh시 mm분 ss초");
+            Log.i("Test", "simpleDateFormat.format(date) :"   + simpleDateFormat.format(date));
+
+            // 기 입력된 DB인지 확인하여 기저장 데이터일 경우에는 날짜만 최신 날짜로 업데이트 해주도록 한다.
+            if ( dbHelper.getAnalysisHistoryByMD5Name(getFileName(fileName_origin),  getFileName(fileName_MD5)).equals(true)) {
+                dbHelper.updateAnalysisHistory(simpleDateFormat.format(date), getFileName(fileName_origin),  getFileName(fileName_MD5));
+            }
+            // 기입력된 DB인지 확인하는 부분
+
+            // 기입력된 APK파일 정보가 아닌 경우에는 그대로 DB에 인서트한다.
+            else {
+                dbHelper.insert(simpleDateFormat.format(date), getFileName(fileName_origin),  getFileName(fileName_MD5), "");
+            }
+            //////////////////지난 분서 결과에 이력을 남기는 부분 끝//////////////////
+            //////////////////////////////////////////////////////////////////////////
 
             return serverResponseCode;
 
         } // End else block
     }
 
-
     public static String getFileName(String fullPath) {
-        int S = fullPath.lastIndexOf("\\");
+        int S = fullPath.lastIndexOf("/");
         int M = fullPath.lastIndexOf(".");
         int E = fullPath.length();
 
         String filename = fullPath.substring(S+1, M);
         String extname = fullPath.substring(M+1, E);
 
-        String extractFileName = filename + "." + extname;
+//        String extractFileName = filename + "." + extname;
+        String extractFileName = filename;
         return extractFileName;
     }
 
@@ -438,6 +468,4 @@ public class FileExplorerActivity extends AppCompatActivity {
         Log.i("Test2", "fileDirPath: " + fileDirPath);
         return fileDirPath;
     }
-
-
 }

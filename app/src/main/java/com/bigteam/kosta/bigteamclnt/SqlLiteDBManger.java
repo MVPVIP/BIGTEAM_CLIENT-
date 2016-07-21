@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 /**
  * Created by kosta on 2016-07-20.
@@ -41,6 +42,7 @@ public class SqlLiteDBManger extends SQLiteOpenHelper {
         // DB에 입력한 값으로 행 추가
         db.execSQL("INSERT INTO ApkAnalysisHistory VALUES(null, '" + apk_name + "', '" + apk_md5_name + "', '" + create_at + "','" + flag +"');" );
         db.close();
+        Log.i("Test", "insertDB FINISH !!!!!!!!!!!!" );
     }
 
     public void update(String create_at, String apk_name, String apk_md5_name) {
@@ -48,7 +50,7 @@ public class SqlLiteDBManger extends SQLiteOpenHelper {
         // 입력한 항목과 일치하는 행의 가격 정보 수정
 
         // 정밀검사를 선택하였을 때 (분석서버로 파일을 전송할 때) 파일의 정보가 기저장된 정보와 일치할 경우 DB의 정보를 일부 업데이트 한다.
-        db.execSQL("UPDATE ApkAnalysisHistory SET price=" + create_at + " WHERE apk_name='" + apk_name + "' AND apk_md5_name='" + apk_md5_name + "';");
+        db.execSQL("UPDATE ApkAnalysisHistory SET create_at=" + create_at + " WHERE apk_name='" + apk_name + "' AND apk_md5_name='" + apk_md5_name + "';");
         db.close();
     }
 
@@ -82,5 +84,29 @@ public class SqlLiteDBManger extends SQLiteOpenHelper {
         }
 
         return result;
+    }
+
+    public Boolean getAnalysisHistoryByMD5Name(String apk_name, String apk_md5_name ) {
+        // 읽기가 가능하게 DB 열기
+        SQLiteDatabase db = getReadableDatabase();
+        String result = "";
+
+        // DB에 있는 데이터를 쉽게 처리하기 위해 Cursor를 사용하여 테이블에 있는 모든 데이터 출력
+        Cursor cursor = db.rawQuery("SELECT * FROM ApkAnalysisHistory WHERE apk_name='" + apk_name + "' AND apk_md5_name='" + apk_md5_name + "';", null);
+        Log.i("Test", "getAnalysisHistoryByMD5Name RESULT :   " + cursor );
+        int countResult = cursor.getCount();
+        Log.i("Test", "getAnalysisHistoryByMD5Name RESULT countResult :   " + countResult );
+        if ( countResult < 1) {
+            return false;   // false 일 때는 신규 분석 대상 데이터로 간주
+        } else return true; // true 일 때 기저장된 데이터가 있는 경우
+    }
+
+    public void updateAnalysisHistory(String create_at, String apk_name, String apk_md5_name) {
+        SQLiteDatabase db = getWritableDatabase();
+        // 입력한 항목과 일치하는 행의 가격 정보 수정
+
+        // 정밀검사를 선택하였을 때 (분석서버로 파일을 전송할 때) 파일의 정보가 기저장된 정보와 일치할 경우 DB의 정보를 일부 업데이트 한다.
+        db.execSQL("UPDATE ApkAnalysisHistory SET create_at='" + create_at + "' WHERE apk_name='" + apk_name + "' AND apk_md5_name='" + apk_md5_name + "';");
+        db.close();
     }
 }

@@ -28,4 +28,10 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, FileExplorerActivity.class);
         startActivity(intent);
     }
+
+    public void onClickApkAnalysisHistory(View view) { // 보유 APK파일 리스트 클릭
+        //intent 생성
+        Intent intent = new Intent(this, ApkAnalysisHistoryListActivity.class);
+        startActivity(intent);
+    }
 }

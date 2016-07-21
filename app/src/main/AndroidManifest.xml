@@ -53,6 +53,13 @@
             >
         </activity>
 
+        <activity
+            android:name=".activity.ApkAnalysisHistoryListActivity"
+            android:label="지난 분석대상 APK 파일 이력 목록"
+            android:screenOrientation="landscape"
+            >
+        </activity>
+
     </application>
 
 </manifest>
