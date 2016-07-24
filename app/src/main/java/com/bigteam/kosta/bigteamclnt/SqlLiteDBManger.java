@@ -6,6 +6,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import java.util.ArrayList;
+
 /**
  * Created by kosta on 2016-07-20.
  */
@@ -27,7 +29,7 @@ public class SqlLiteDBManger extends SQLiteOpenHelper {
         /* 테이블의 이름은 ApkAnalysisHistory, 자동으로 값이 증가하는 _id 정수형 기본키 컬럼과
         apk_name 문자열 컬럼, apk_md5_name 문자열 컬럼, create_at 문자열 컬럼, flag 문자열 컬럼 으로 구성된 테이블을 생성. */
 //        db.execSQL("CREATE TABLE MONEYBOOK (_id INTEGER PRIMARY KEY AUTOINCREMENT, item TEXT, price INTEGER, create_at TEXT);");
-        db.execSQL("CREATE TABLE ApkAnalysisHistory (_id INTEGER PRIMARY KEY AUTOINCREMENT, apk_name TEXT, apk_md5_name TEXT, create_at TEXT, flag TEXT);");
+        db.execSQL("CREATE TABLE ApkAnalysisHistory (_id INTEGER KEY AUTOINCREMENT, apk_name TEXT PRIMARY KEY, apk_md5_name TEXT PRIMARY KEY, create_at TEXT, flag TEXT);");
     }
 
     // DB 업그레이드를 위해 버전이 변경될 때 호출되는 함수
@@ -61,29 +63,30 @@ public class SqlLiteDBManger extends SQLiteOpenHelper {
         db.close();
     }
 
-    public String getApkAnalysisHistory() {
+    public Cursor getApkAnalysisHistory() {
         // 읽기가 가능하게 DB 열기
         SQLiteDatabase db = getReadableDatabase();
-        String result = "";
+        ArrayList resultList = null;
 
         // DB에 있는 데이터를 쉽게 처리하기 위해 Cursor를 사용하여 테이블에 있는 모든 데이터 출력
         Cursor cursor = db.rawQuery("SELECT * FROM ApkAnalysisHistory ORDER BY create_at desc ", null);
 //        while (cursor.moveToNext()) {
-//            result += cursor.getString(0)
-//                    + " : "
-//                    + cursor.getString(1)
-//                    + " | "
-//                    + cursor.getInt(2)
-//                    + "원 "
-//                    + cursor.getString(3)
-//                    + "\n";
+////            result += cursor.getString(0)
+////                    + " : "
+////                    + cursor.getString(1)
+////                    + " | "
+////                    + cursor.getInt(2)
+////                    + "원 "
+////                    + cursor.getString(3)
+////                    + "\n";
+//            resultList.add()
 //        }
-        while (cursor.moveToNext()) {
-            // 아마도 ArrayList로 보여줘야 될 것으로 생각됨.
-            // 추후 개발 할 것.
-        }
+//        while (cursor.moveToNext()) {
+//            // 아마도 ArrayList로 보여줘야 될 것으로 생각됨.
+//            // 추후 개발 할 것.
+//        }
 
-        return result;
+        return cursor;
     }
 
     public Boolean getAnalysisHistoryByMD5Name(String apk_name, String apk_md5_name ) {

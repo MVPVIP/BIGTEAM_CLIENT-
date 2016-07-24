@@ -29,6 +29,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -241,19 +242,20 @@ public class FileExplorerActivity extends AppCompatActivity {
 
     private void getDir(String dirPath) {
         mPath.setText("Location: " + dirPath);
-//        Log.i("Test", "Location: " + dirPath);
-
+        //화면 상단에 나타낼 현재 위치한 디렉토리 경로
         lItem = new ArrayList<String>();
+        //디렉토리의 파일명을 담는다
         lPath = new ArrayList<String>();
+        //디렉토리의 경로를 담는다.
 
         File f = new File(dirPath);
         File[] files = f.listFiles();
 
         if (!dirPath.equals(mRoot)) {
-            //item.add(root); //to root.
-            //path.add(root);
-            lItem.add("../"); //to parent folder
+            lItem.add("../");
+            //상위 디렉토리로 이동하기 위한 경로 설정
             lPath.add(f.getParent());
+            //상위 디렉토리의 경로를 담는다.
         }
 
         for (int i = 0; i < files.length; i++) {
@@ -308,8 +310,9 @@ public class FileExplorerActivity extends AppCompatActivity {
             try {
                 // open a URL connection to the Servlet
                 FileInputStream fileInputStream = new FileInputStream(sourceFile);
-                URL url = new URL(upLoadServerUri);
 
+                URL url = new URL(upLoadServerUri);
+                // upLoadServerUri : 분석서버 저장소 타겟 서버URI
                 // Open a HTTP  connection to  the URL
                 conn = (HttpURLConnection) url.openConnection();
                 conn.setDoInput(true); // Allow Inputs
@@ -383,28 +386,24 @@ public class FileExplorerActivity extends AppCompatActivity {
                 dos.close();
 
             } catch (MalformedURLException ex) {
-
 //                dialog.dismiss();
                 ex.printStackTrace();
-
                 runOnUiThread(new Runnable() {
                     public void run() {
                         messageText.setText("MalformedURLException Exception : check script url.");
-                        Toast.makeText(FileExplorerActivity.this, "MalformedURLException",
+                        Toast.makeText(FileExplorerActivity.this, "MalformedURLException: The URL address is incorrect",
                                 Toast.LENGTH_SHORT).show();
                     }
                 });
 
                 Log.e("Upload file to server", "error: " + ex.getMessage(), ex);
-            } catch (Exception e) {
-
+            } catch (IOException e) { // IOException으로 변경 (Exception이었음)
 //                dialog.dismiss();
                 e.printStackTrace();
-
                 runOnUiThread(new Runnable() {
                     public void run() {
                         messageText.setText("Got Exception : see logcat ");
-                        Toast.makeText(FileExplorerActivity.this, "Got Exception : see logcat ",
+                        Toast.makeText(FileExplorerActivity.this, "IOException: It can't to the web page ",
                                 Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -415,7 +414,6 @@ public class FileExplorerActivity extends AppCompatActivity {
             File fileNow = new File(fileName_MD5);
             fileNow.delete();
 
-
             //////////////////////////////////////////////////////////////////////////
             //////////////// 지난 분석 결과에 이력을 남기는 부분 시작/////////////////
             final SqlLiteDBManger dbHelper = new SqlLiteDBManger(getApplicationContext(), "ApkAnalysisHistory.db", null, 1);
@@ -424,7 +422,7 @@ public class FileExplorerActivity extends AppCompatActivity {
             // 현재 시간 구하기
             long now = System.currentTimeMillis();
             Date date = new Date(now);        // 출력될 포맷 설정
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy년 MM월 dd일 hh시 mm분 ss초");
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy년 MM월 dd일 HH시 mm분 ss초");
             Log.i("Test", "simpleDateFormat.format(date) :"   + simpleDateFormat.format(date));
 
             // 기 입력된 DB인지 확인하여 기저장 데이터일 경우에는 날짜만 최신 날짜로 업데이트 해주도록 한다.

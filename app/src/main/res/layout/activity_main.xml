@@ -24,7 +24,7 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="보유 APK파일 목록"
+        android:text="파일탐색기(보유 APK파일 찾기)"
         android:onClick="onClickFileExplorer"
         android:id="@+id/button2"
         android:layout_above="@+id/button3"
